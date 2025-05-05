@@ -1,22 +1,16 @@
-// src/components/HistoryList.tsx
 import { HistoryItem } from "@/types/history";
 import { format, isToday, isYesterday, isThisWeek, parseISO } from "date-fns";
 
 type HistoryListProps = {
   chat: HistoryItem[];
   setChat: React.Dispatch<React.SetStateAction<HistoryItem[]>>;
+  onSelect: (item: HistoryItem) => void;
 };
 
 const groupByDate = (items: HistoryItem[]) => {
   const groups: { [key: string]: HistoryItem[] } = {};
 
   items.forEach((item) => {
-    // 🔐 Guard against missing or bad dates
-    if (!item.created_at || isNaN(Date.parse(item.created_at))) {
-      console.warn("⚠️ Skipping item with bad date:", item);
-      return;
-    }
-
     const date = parseISO(item.created_at);
     let key = "Earlier";
 
@@ -31,8 +25,20 @@ const groupByDate = (items: HistoryItem[]) => {
   return groups;
 };
 
-export default function HistoryList({ chat, setChat }: HistoryListProps) {
+export default function HistoryList({
+  chat,
+  setChat,
+  onSelect,
+}: HistoryListProps) {
   const grouped = groupByDate(chat);
+
+  if (chat.length === 0) {
+    return (
+      <div className="text-center text-sm text-gray-400 mt-4">
+        No history yet.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -45,6 +51,7 @@ export default function HistoryList({ chat, setChat }: HistoryListProps) {
                 <li
                   key={item.id}
                   className="bg-gray-800 p-3 rounded text-sm hover:bg-gray-700 cursor-pointer"
+                  onClick={() => onSelect(item)}
                 >
                   <strong className="block truncate">{item.question}</strong>
                   <span className="text-gray-400 text-xs">
