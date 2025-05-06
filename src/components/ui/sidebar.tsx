@@ -6,6 +6,7 @@ import { LayoutDashboard, Plus, Search, PenLine } from "lucide-react";
 import HistoryList from "@/components/HistoryList";
 import { HistoryItem } from "@/types/history";
 import SearchModal from "@/components/ui/SearchModal";
+import SearchPanel from "./SearchPanel";
 type SidebarProps = {
   chat: HistoryItem[];
   setChat: React.Dispatch<React.SetStateAction<HistoryItem[]>>;
@@ -19,14 +20,18 @@ export default function Sidebar({
 }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
 
-  // 🔄 Toggle collapsed state
+  //  Toggle collapsed state
   const toggleCollapsed = () => setCollapsed(!collapsed);
 
-  // 🆕 Optional: handle new chat click
+  //Optional: handle new chat click
   const onNewChat = () => {
-    // You can clear current document/question state here via a callback if needed
+    //You can clear current document/question state here via a callback if needed
     console.log("🆕 Start new chat");
   };
+
+  //State for the modal
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   return (
     <aside
@@ -48,7 +53,7 @@ export default function Sidebar({
         </button>
 
         {/* 🔍 Search icon */}
-        <button title="Search">
+        <button onClick={() => setSearchOpen(true)} title="Search">
           <Search className="w-5 h-5" />
         </button>
 
@@ -61,7 +66,11 @@ export default function Sidebar({
       {/* 📜 Scrollable history - only if expanded */}
       {!collapsed && (
         <ScrollArea className="flex-1 p-4">
-          <HistoryList chat={chat} setChat={setChat} onSelect={onSelectEntry} />
+          <HistoryList
+            chat={chat}
+            setChat={setChat}
+            onSelect={onSelectEntry || (() => {})}
+          />
         </ScrollArea>
       )}
 
@@ -81,6 +90,18 @@ export default function Sidebar({
           {!collapsed && "Upload File"}
         </button>
       </div>
+
+      <SearchPanel
+        open={searchOpen}
+        onClose={() => {
+          setSearchOpen(false);
+          setSearchTerm("");
+        }}
+        chat={chat}
+        onSelect={onSelectEntry || (() => {})}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
     </aside>
   );
 }

@@ -13,7 +13,7 @@ type DashboardLayoutProps = {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user } = useUser();
-  const [chat, setChat] = useState<HistoryItem[]>([]); // 🛠️ Add the type here
+  const [chat, setChat] = useState<HistoryItem[]>([]);
 
   useEffect(() => {
     const loadHistory = async () => {
@@ -27,9 +27,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     loadHistory();
   }, [user?.primaryEmailAddress?.emailAddress]);
 
+  // ✅ Add this function
+  function onSelectEntry(item: HistoryItem) {
+    console.log("📌 Selected chat from sidebar/search modal:", item);
+    // You can do more with this, like lifting it up
+  }
+
   return (
     <div className="flex">
-      <Sidebar chat={chat} setChat={setChat} />
+      <Sidebar chat={chat} setChat={setChat} onSelectEntry={onSelectEntry} />
       <main className="flex-1">{children}</main>
     </div>
   );
